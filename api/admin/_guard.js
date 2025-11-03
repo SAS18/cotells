@@ -1,1 +1,1 @@
-export function requireAdmin(req,res){const token=(req.headers['authorization']||'').replace(/^Bearer\s+/i,'').trim();const admin=process.env.ADMIN_TOKEN||'cotells_admin_2025';if(!token||token!==admin){res.status(401).json({error:'Unauthorized'});return false;}return true;}
+export function requireAdmin(req,res){const t=(req.headers['authorization']||'').replace(/^Bearer\s+/i,'').trim();const admin=process.env.ADMIN_TOKEN||'cotells_admin_2025';if(!t||t!==admin){res.status(401).json({error:'Unauthorized'});return false;}return true;}
