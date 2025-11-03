@@ -39,20 +39,16 @@
       <div class="hero-art">
         <div class="card">
           <h3>Dagens tema</h3>
-          <p id="topic">Grønt industriløft</p>
+          <p id="topic">Laster…</p>
           <div class="meter" aria-label="Aggregert sentiment">
-            <div class="meter-fill" id="sentiment" style="width: 58%"></div>
+            <div class="meter-fill" id="sentiment" style="width: 50%"></div>
           </div>
           <div class="labels">
             <span>Negativ</span><span>Nøytral</span><span>Positiv</span>
           </div>
           <div class="poll">
-            <p class="question" id="question">Støtter du økte statlige investeringer i grønn industri?</p>
-            <div class="options">
-              <button class="option" data-choice="Ja">Ja</button>
-              <button class="option" data-choice="Nei">Nei</button>
-              <button class="option" data-choice="Usikker">Usikker</button>
-            </div>
+            <p class="question" id="question">Laster…</p>
+            <div class="options" id="options"></div>
             <p id="vote-msg" class="small" style="display:none;"></p>
           </div>
         </div>
@@ -118,31 +114,45 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-
     document.getElementById("signup-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value;
       alert("Takk! Vi lagrer " + email + " for tidlig tilgang.");
     });
 
-    const msg = document.getElementById('vote-msg');
-    document.querySelectorAll('.option').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        try {
-          const r = await fetch('/api/vote', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question_id: '00000000-0000-0000-0000-000000000000', choice: btn.dataset.choice })
-          });
-          const j = await r.json();
-          msg.style.display = 'block';
-          msg.textContent = r.ok ? 'Takk for stemmen!' : (j.error || 'Noe gikk galt');
-        } catch (e) {
-          msg.style.display = 'block';
-          msg.textContent = 'Feil ved innsending.';
+    async function loadTopic() {
+      try {
+        const r = await fetch('/api/topics');
+        const j = await r.json();
+        const t = j.topics?.[0];
+        if (!t) return;
+        document.getElementById('topic').textContent = t.title || 'Ukentlig tema';
+        document.getElementById('question').textContent = t.question || 'Hva mener du?';
+        const meter = Math.round(((t.sentiment ?? 0) + 1) * 50);
+        document.getElementById('sentiment').style.width = meter + '%';
+
+        const options = document.getElementById('options');
+        options.innerHTML = '';
+        for (const c of ['Ja','Nei','Usikker']) {
+          const b = document.createElement('button');
+          b.className = 'option';
+          b.textContent = c;
+          b.onclick = async () => {
+            const r2 = await fetch('/api/vote', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({ question_id: t.id, choice: c })
+            });
+            const j2 = await r2.json();
+            const msg = document.getElementById('vote-msg');
+            msg.style.display = 'block';
+            msg.textContent = r2.ok ? 'Takk for stemmen!' : (j2.error || 'Noe gikk galt');
+          };
+          options.appendChild(b);
         }
-      });
-    });
+      } catch(e){}
+    }
+    loadTopic();
   </script>
 </body>
 </html>

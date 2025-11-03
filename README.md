@@ -1,1 +1,1 @@
-Cotells – full MVP med API, cron og Supabase. Se README i repoet.
+Cotells – Vercel KV eller demo-modus. Ingen Supabase nødvendig.

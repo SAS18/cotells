@@ -1,11 +1,11 @@
-import { supabase } from './_supabase.js';
-
-export default async function handler(req, res) {
-  const { data, error } = await supabase
-    .from('topics')
-    .select('id,title,summary,sentiment,momentum_score,created_at,questions(id,text,active)')
-    .order('momentum_score', { ascending: false })
-    .limit(20);
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(200).json({ topics: data });
+import { getJSON } from './_store.js';
+export default async function handler(req, res){
+  const topics = await getJSON('topics');
+  if(!topics){
+    return res.status(200).json({ topics: [{
+      id: 'demo1', title: 'Grønt industriløft',
+      question: 'Støtter du økte statlige investeringer i grønn industri?', sentiment: 0.2
+    }] });
+  }
+  res.status(200).json({ topics });
 }

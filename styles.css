@@ -46,5 +46,5 @@ a:hover { text-decoration: underline; }
 
 @media (max-width:900px){
   .hero-inner{ grid-template-columns: 1fr; }
-  .grid, .steps{ grid-template-columns: 1fr; }
+  .grid, .steps{ grid-template-columns: 1 fr; }
 }
