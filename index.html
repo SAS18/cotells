@@ -1,1 +1,62 @@
-<!DOCTYPE html><html lang='no'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Cotells</title><link rel='stylesheet' href='/styles.css'></head><body><a class='brand' href='/'><img src='/logo.svg' width='28'><span class='brand-name'>Cotells</span></a> · <a href='/admin/'>Admin</a><h1>Dagens tema</h1><p id='topic'></p><script>fetch('/api/topics').then(r=>r.json()).then(j=>{const t=j.topics&&j.topics[0]; if(t){ document.getElementById('topic').textContent=t.title; }});</script></body></html>
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cotells – Dagens tema</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">Cotells</a>
+    <a href="/admin" class="admin-link">Admin</a>
+  </header>
+
+  <main>
+    <section id="topic-section">
+      <h1>Dagens tema</h1>
+      <p id="topic-text">Laster dagens tema …</p>
+
+      <div id="vote-buttons">
+        <button id="vote-up">👍 Enig</button>
+        <button id="vote-down">👎 Uenig</button>
+      </div>
+    </section>
+
+    <section id="newsletter">
+      <h2>Få tilgang</h2>
+      <form id="email-form">
+        <input type="email" id="email" placeholder="Din e-postadresse" required />
+        <button type="submit">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Cotells</p>
+  </footer>
+
+  <script>
+    async function loadTopic() {
+      try {
+        const res = await fetch('/api/topics');
+        const data = await res.json();
+        document.getElementById('topic-text').textContent =
+          data?.topic || 'Ingen tema funnet.';
+      } catch (e) {
+        document.getElementById('topic-text').textContent =
+          'Kunne ikke laste tema.';
+      }
+    }
+
+    loadTopic();
+
+    document.getElementById('vote-up').addEventListener('click', () =>
+      fetch('/api/vote', { method: 'POST', body: JSON.stringify({ vote: 'up' }) })
+    );
+    document.getElementById('vote-down').addEventListener('click', () =>
+      fetch('/api/vote', { method: 'POST', body: JSON.stringify({ vote: 'down' }) })
+    );
+  </script>
+</body>
+</html>
