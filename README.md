@@ -1,1 +1,1 @@
-Admin-added build. /admin/ uses ADMIN_TOKEN (default cotells_admin_2025).
+Cotells – Vercel KV eller demo-modus. Ingen Supabase nødvendig.
