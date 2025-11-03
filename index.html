@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cotells — Digitalt Samtidsbarometer</title>
+  <meta name="description" content="AI-drevet nyhetsbarometer, meningsmålinger og sanntids stemningsanalyse." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <div class="brand">
+        <img src="logo.svg" alt="Cotells logo" width="28" height="28" />
+        <span class="brand-name">Cotells</span>
+      </div>
+      <nav>
+        <a href="#funksjoner">Funksjoner</a>
+        <a href="#demo">Demo</a>
+        <a href="#kontakt" class="cta-link">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1>Digitalt Samtidsbarometer</h1>
+        <p>Cotells samler nyheter, genererer presise spørsmål og viser hva folk faktisk mener – i sanntid.</p>
+        <form class="signup" id="signup-form">
+          <input type="email" id="email" placeholder="E-post for tidlig tilgang" required />
+          <button type="submit">Få tilgang</button>
+        </form>
+        <p class="small">Ved å registrere deg godtar du vår <a href="#personvern">personvernerklæring</a>.</p>
+      </div>
+      <div class="hero-art">
+        <div class="card">
+          <h3>Dagens tema</h3>
+          <p id="topic">Laster…</p>
+          <div class="meter">
+            <div class="meter-fill" id="sentiment" style="width: 58%"></div>
+          </div>
+          <div class="labels">
+            <span>Negativ</span><span>Nøytral</span><span>Positiv</span>
+          </div>
+          <div class="poll">
+            <p class="question" id="question">Bør staten subsidiere elbillading?</p>
+            <div class="options">
+              <button class="option">Ja</button>
+              <button class="option">Nei</button>
+              <button class="option">Usikker</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="funksjoner" class="features">
+    <div class="container grid">
+      <div class="feature">
+        <h3>AI-kurert nyhetsstrøm</h3>
+        <p>Fanger opp saker fra troverdige kilder, klustrer og rangerer relevans og momentum.</p>
+      </div>
+      <div class="feature">
+        <h3>Spørsmål som betyr noe</h3>
+        <p>Store språkmodeller genererer korte, balanserte spørsmål som måler reell mening – ikke støy.</p>
+      </div>
+      <div class="feature">
+        <h3>Sanntids-stemning</h3>
+        <p>Aggregert sentiment og trendlinjer på tvers av tema, region og demografi.</p>
+      </div>
+      <div class="feature">
+        <h3>Panel & deling</h3>
+        <p>Inviter paneler, del lenker og embed live-widgets hvor som helst.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo" class="demo">
+    <div class="container">
+      <h2>Demo-data</h2>
+      <pre id="demo-json" class="code"></pre>
+    </div>
+  </section>
+
+  <section id="kontakt" class="contact">
+    <div class="container">
+      <h2>Kontakt</h2>
+      <p>Vil du være pilotkunde eller partner? Send e-post til <a href="mailto:hello@cotells.com">hello@cotells.com</a>.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© <span id="year"></span> Cotells</span>
+      <a href="#personvern">Personvern</a>
+      <a href="#vilkar">Vilkår</a>
+    </div>
+  </footer>
+
+  <script>
+    const demo = {
+      topic: "Grønt industriløft",
+      sentiment: 0.58,
+      question: "Støtter du økte statlige investeringer i grønn industri?",
+      options: ["Ja", "Nei", "Usikker"],
+      news: [
+        {title: "Regjeringen lanserer ny støtteordning", source: "NRK", url: "#"},
+        {title: "Industrien etterlyser krafttilgang", source: "E24", url: "#"},
+        {title: "Eksperter: Effekt på utslipp usikker", source: "Aftenposten", url: "#"}
+      ]
+    };
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("topic").textContent = demo.topic;
+    document.getElementById("sentiment").style.width = Math.round(demo.sentiment * 100) + "%";
+    document.getElementById("question").textContent = demo.question;
+    document.getElementById("demo-json").textContent = JSON.stringify(demo, null, 2);
+
+    document.getElementById("signup-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      alert("Takk! Vi lagrer " + email + " for tidlig tilgang.");
+    });
+  </script>
+</body>
+</html>

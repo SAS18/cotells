@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Cotells API (MVP)
+  version: 0.1.0
+paths:
+  /topics:
+    get:
+      summary: List topics
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create topic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                summary: { type: string }
+      responses:
+        '201': { description: Created }
+  /questions:
+    get:
+      summary: List questions
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create question
+      responses:
+        '201': { description: Created }
+  /votes:
+    post:
+      summary: Submit a vote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_id: { type: string }
+                choice: { type: string, enum: [Ja, Nei, Usikker] }
+      responses:
+        '201': { description: Created }
