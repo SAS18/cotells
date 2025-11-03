@@ -7,7 +7,7 @@ a:hover { text-decoration: underline; }
 
 .nav { position: sticky; top:0; background: rgba(10,14,32,0.8); backdrop-filter: blur(8px); border-bottom:1px solid rgba(125,211,252,0.15); }
 .nav .container { display:flex; align-items:center; justify-content:space-between; height:64px; }
-.brand{ display:flex; align-items:center; gap:10px; }
+.brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
 .brand-name{ font-weight:800; color:#e2e8f0; letter-spacing:0.2px; }
 .nav a{ margin-left:16px; color:#cbd5e1; }
 .cta-link{ padding:10px 14px; border:1px solid rgba(125,211,252,0.35); border-radius:12px; }

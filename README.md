@@ -1,1 +1,1 @@
-Cotells MVP v2 – ren landingsside uten synlig JSON/demo-kode.
+Cotells – full MVP med API, cron og Supabase. Se README i repoet.

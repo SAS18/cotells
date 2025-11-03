@@ -8,15 +8,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <header class="nav">
     <div class="container">
-      <div class="brand">
-        <img src="logo.svg" alt="Cotells logo" width="28" height="28" />
+      <a class="brand" href="/" aria-label="Gå til forsiden">
+        <img src="/logo.svg" alt="Cotells logo" width="28" height="28" />
         <span class="brand-name">Cotells</span>
-      </div>
+      </a>
       <nav>
         <a href="#funksjoner">Funksjoner</a>
         <a href="#hvordan">Slik virker det</a>
@@ -49,10 +49,11 @@
           <div class="poll">
             <p class="question" id="question">Støtter du økte statlige investeringer i grønn industri?</p>
             <div class="options">
-              <button class="option">Ja</button>
-              <button class="option">Nei</button>
-              <button class="option">Usikker</button>
+              <button class="option" data-choice="Ja">Ja</button>
+              <button class="option" data-choice="Nei">Nei</button>
+              <button class="option" data-choice="Usikker">Usikker</button>
             </div>
+            <p id="vote-msg" class="small" style="display:none;"></p>
           </div>
         </div>
       </div>
@@ -103,7 +104,7 @@
   <section id="kontakt" class="contact">
     <div class="container">
       <h2>Kontakt</h2>
-      <p>Vil du være pilotkunde eller partner? Send e-post til <a href="mailto:hello@cotells.com">hello@cotells.com</a>.</p>
+      <p>Kontakt oss: <a href="mailto:support@cotells.com">support@cotells.com</a></p>
     </div>
   </section>
 
@@ -117,10 +118,30 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
     document.getElementById("signup-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value;
       alert("Takk! Vi lagrer " + email + " for tidlig tilgang.");
+    });
+
+    const msg = document.getElementById('vote-msg');
+    document.querySelectorAll('.option').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          const r = await fetch('/api/vote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question_id: '00000000-0000-0000-0000-000000000000', choice: btn.dataset.choice })
+          });
+          const j = await r.json();
+          msg.style.display = 'block';
+          msg.textContent = r.ok ? 'Takk for stemmen!' : (j.error || 'Noe gikk galt');
+        } catch (e) {
+          msg.style.display = 'block';
+          msg.textContent = 'Feil ved innsending.';
+        }
+      });
     });
   </script>
 </body>
