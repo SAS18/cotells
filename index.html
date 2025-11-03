@@ -1,1 +1,158 @@
-<!DOCTYPE html><html lang='no'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Cotells</title><link rel='stylesheet' href='/styles.css'></head><body><a class='brand' href='/'><img src='/logo.svg' width='28'><span class='brand-name'>Cotells</span></a><a href='/admin/'>Admin</a><h1>Dagens tema</h1><p id='topic'></p><script>fetch('/api/topics').then(r=>r.json()).then(j=>{const t=j.topics&&j.topics[0]; if(t){ document.getElementById('topic').textContent=t.title; }});</script></body></html>
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cotells — Digitalt Samtidsbarometer</title>
+  <meta name="description" content="AI-drevet nyhetsbarometer, meningsmålinger og sanntids stemningsanalyse." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="container">
+      <a class="brand" href="/" aria-label="Gå til forsiden">
+        <img src="/logo.svg" alt="Cotells logo" width="28" height="28" />
+        <span class="brand-name">Cotells</span>
+      </a>
+      <nav>
+        <a href="#funksjoner">Funksjoner</a>
+        <a href="#hvordan">Slik virker det</a>
+        <a href="#kontakt" class="cta-link">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1>Digitalt Samtidsbarometer</h1>
+        <p>Cotells kuraterer nyheter, genererer presise spørsmål og viser sanntidsstemning – på ett sted.</p>
+        <form class="signup" id="signup-form">
+          <input type="email" id="email" placeholder="E-post for tidlig tilgang" required />
+          <button type="submit">Få tilgang</button>
+        </form>
+        <p class="small">Ved å registrere deg godtar du vår <a href="#personvern">personvernerklæring</a>.</p>
+      </div>
+      <div class="hero-art">
+        <div class="card">
+          <h3>Dagens tema</h3>
+          <p id="topic">Laster…</p>
+          <div class="meter" aria-label="Aggregert sentiment">
+            <div class="meter-fill" id="sentiment" style="width: 50%"></div>
+          </div>
+          <div class="labels">
+            <span>Negativ</span><span>Nøytral</span><span>Positiv</span>
+          </div>
+          <div class="poll">
+            <p class="question" id="question">Laster…</p>
+            <div class="options" id="options"></div>
+            <p id="vote-msg" class="small" style="display:none;"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="funksjoner" class="features">
+    <div class="container grid">
+      <div class="feature">
+        <h3>AI-kurert nyhetsstrøm</h3>
+        <p>Fanger opp saker fra troverdige kilder, klustrer og rangerer relevans og momentum.</p>
+      </div>
+      <div class="feature">
+        <h3>Spørsmål som betyr noe</h3>
+        <p>Språkmodeller genererer korte, balanserte spørsmål som måler reell mening – ikke støy.</p>
+      </div>
+      <div class="feature">
+        <h3>Sanntids-stemning</h3>
+        <p>Aggregert sentiment og trender på tvers av tema, region og demografi.</p>
+      </div>
+      <div class="feature">
+        <h3>Panel & deling</h3>
+        <p>Inviter paneler, del lenker og embed live-widgets hvor som helst.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="hvordan" class="how">
+    <div class="container steps">
+      <div class="step">
+        <span class="badge">1</span>
+        <h4>Fang</h4>
+        <p>Henter nyheter fra kilder du stoler på.</p>
+      </div>
+      <div class="step">
+        <span class="badge">2</span>
+        <h4>Formuler</h4>
+        <p>AI lager nøytrale avstemningsspørsmål.</p>
+      </div>
+      <div class="step">
+        <span class="badge">3</span>
+        <h4>Mål</h4>
+        <p>Visualiserer svar og sentiment i sanntid.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="kontakt" class="contact">
+    <div class="container">
+      <h2>Kontakt</h2>
+      <p>Kontakt oss: <a href="mailto:support@cotells.com">support@cotells.com</a></p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© <span id="year"></span> Cotells</span>
+      <a href="#personvern">Personvern</a>
+      <a href="#vilkar">Vilkår</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("signup-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      alert("Takk! Vi lagrer " + email + " for tidlig tilgang.");
+    });
+
+    async function loadTopic() {
+      try {
+        const r = await fetch('/api/topics');
+        const j = await r.json();
+        const t = j.topics?.[0];
+        if (!t) return;
+        document.getElementById('topic').textContent = t.title || 'Ukentlig tema';
+        document.getElementById('question').textContent = t.question || 'Hva mener du?';
+        const meter = Math.round(((t.sentiment ?? 0) + 1) * 50);
+        document.getElementById('sentiment').style.width = meter + '%';
+
+        const options = document.getElementById('options');
+        options.innerHTML = '';
+        for (const c of ['Ja','Nei','Usikker']) {
+          const b = document.createElement('button');
+          b.className = 'option';
+          b.textContent = c;
+          b.onclick = async () => {
+            const r2 = await fetch('/api/vote', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({ question_id: t.id, choice: c })
+            });
+            const j2 = await r2.json();
+            const msg = document.getElementById('vote-msg');
+            msg.style.display = 'block';
+            msg.textContent = r2.ok ? 'Takk for stemmen!' : (j2.error || 'Noe gikk galt');
+          };
+          options.appendChild(b);
+        }
+      } catch(e){}
+    }
+    loadTopic();
+  </script>
+</body>
+</html>
