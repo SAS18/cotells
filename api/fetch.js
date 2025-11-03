@@ -11,16 +11,16 @@ const SOURCES = [
   'https://www.abcnyheter.no/nyheter/rss',
   'https://www.tu.no/rss'
 ];
-const q=t=> (t&&t.length>120?t.slice(0,117)+'…':(t||'dette forslaget'));
-export default async function handler(req,res){
+const short = t => (t && t.length > 120 ? t.slice(0,117) + '…' : (t || 'dette forslaget'));
+export default async function handler(req, res){
   try{
-    const feeds = await Promise.allSettled(SOURCES.map(u=>parser.parseURL(u)));
-    const items = feeds.flatMap(f=>f.value?.items||[]).slice(0,40);
-    const topics = items.map((it,i)=>({
-      id:`t_${i}`, title: it.title?.trim()||'Uten tittel',
-      question:`Støtter du: ${q(it.title)}?`, sentiment:0,
-      url: it.link||null, source: it.link? new URL(it.link).hostname:'ukjent',
-      published_at: it.isoDate||null
+    const feeds = await Promise.allSettled(SOURCES.map(u => parser.parseURL(u)));
+    const items = feeds.flatMap(f => f.value?.items || []).slice(0,40);
+    const topics = items.map((it,i)=> ({
+      id:`t_${i}`, title: it.title?.trim() || 'Uten tittel',
+      question:`Støtter du: ${short(it.title)}?`, sentiment:0,
+      url: it.link || null, source: it.link ? new URL(it.link).hostname : 'ukjent',
+      published_at: it.isoDate || null
     }));
     await setJSON('topics', topics);
     res.status(200).json({ ok:true, topics: topics.length });
