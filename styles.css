@@ -35,14 +35,16 @@ a:hover { text-decoration: underline; }
 .grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:18px; }
 .feature{ background: rgba(2,6,23,0.4); border:1px solid rgba(125,211,252,0.15); border-radius:16px; padding:18px; color:#cbd5e1; }
 
-.demo{ padding:50px 0; }
-.code{ background:#0b1020; color:#e2e8f0; border:1px solid rgba(125,211,252,0.2); padding:16px; border-radius:12px; overflow:auto; }
+.how{ padding:40px 0; }
+.steps{ display:grid; grid-template-columns: repeat(3, 1fr); gap:18px; }
+.step{ background: rgba(2,6,23,0.4); border:1px solid rgba(125,211,252,0.15); border-radius:16px; padding:18px; color:#cbd5e1; position:relative; }
+.badge{ position:absolute; top:12px; right:12px; background:#22d3ee; color:#001018; width:28px; height:28px; display:grid; place-items:center; border-radius:999px; font-weight:800; }
 
 .contact{ padding:40px 0; }
 .footer{ padding:16px 0; border-top:1px solid rgba(125,211,252,0.15); color:#94a3b8; }
-.footer .container{ display:flex; gap:16px; align-items:center; }
+.footer .container{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
 
 @media (max-width:900px){
   .hero-inner{ grid-template-columns: 1fr; }
-  .grid{ grid-template-columns: 1fr; }
+  .grid, .steps{ grid-template-columns: 1fr; }
 }

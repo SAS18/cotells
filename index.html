@@ -19,7 +19,7 @@
       </div>
       <nav>
         <a href="#funksjoner">Funksjoner</a>
-        <a href="#demo">Demo</a>
+        <a href="#hvordan">Slik virker det</a>
         <a href="#kontakt" class="cta-link">Kontakt</a>
       </nav>
     </div>
@@ -29,7 +29,7 @@
     <div class="container hero-inner">
       <div class="hero-copy">
         <h1>Digitalt Samtidsbarometer</h1>
-        <p>Cotells samler nyheter, genererer presise spørsmål og viser hva folk faktisk mener – i sanntid.</p>
+        <p>Cotells kuraterer nyheter, genererer presise spørsmål og viser sanntidsstemning – på ett sted.</p>
         <form class="signup" id="signup-form">
           <input type="email" id="email" placeholder="E-post for tidlig tilgang" required />
           <button type="submit">Få tilgang</button>
@@ -39,15 +39,15 @@
       <div class="hero-art">
         <div class="card">
           <h3>Dagens tema</h3>
-          <p id="topic">Laster…</p>
-          <div class="meter">
+          <p id="topic">Grønt industriløft</p>
+          <div class="meter" aria-label="Aggregert sentiment">
             <div class="meter-fill" id="sentiment" style="width: 58%"></div>
           </div>
           <div class="labels">
             <span>Negativ</span><span>Nøytral</span><span>Positiv</span>
           </div>
           <div class="poll">
-            <p class="question" id="question">Bør staten subsidiere elbillading?</p>
+            <p class="question" id="question">Støtter du økte statlige investeringer i grønn industri?</p>
             <div class="options">
               <button class="option">Ja</button>
               <button class="option">Nei</button>
@@ -67,11 +67,11 @@
       </div>
       <div class="feature">
         <h3>Spørsmål som betyr noe</h3>
-        <p>Store språkmodeller genererer korte, balanserte spørsmål som måler reell mening – ikke støy.</p>
+        <p>Språkmodeller genererer korte, balanserte spørsmål som måler reell mening – ikke støy.</p>
       </div>
       <div class="feature">
         <h3>Sanntids-stemning</h3>
-        <p>Aggregert sentiment og trendlinjer på tvers av tema, region og demografi.</p>
+        <p>Aggregert sentiment og trender på tvers av tema, region og demografi.</p>
       </div>
       <div class="feature">
         <h3>Panel & deling</h3>
@@ -80,10 +80,23 @@
     </div>
   </section>
 
-  <section id="demo" class="demo">
-    <div class="container">
-      <h2>Demo-data</h2>
-      <pre id="demo-json" class="code"></pre>
+  <section id="hvordan" class="how">
+    <div class="container steps">
+      <div class="step">
+        <span class="badge">1</span>
+        <h4>Fang</h4>
+        <p>Henter nyheter fra kilder du stoler på.</p>
+      </div>
+      <div class="step">
+        <span class="badge">2</span>
+        <h4>Formuler</h4>
+        <p>AI lager nøytrale avstemningsspørsmål.</p>
+      </div>
+      <div class="step">
+        <span class="badge">3</span>
+        <h4>Mål</h4>
+        <p>Visualiserer svar og sentiment i sanntid.</p>
+      </div>
     </div>
   </section>
 
@@ -103,24 +116,7 @@
   </footer>
 
   <script>
-    const demo = {
-      topic: "Grønt industriløft",
-      sentiment: 0.58,
-      question: "Støtter du økte statlige investeringer i grønn industri?",
-      options: ["Ja", "Nei", "Usikker"],
-      news: [
-        {title: "Regjeringen lanserer ny støtteordning", source: "NRK", url: "#"},
-        {title: "Industrien etterlyser krafttilgang", source: "E24", url: "#"},
-        {title: "Eksperter: Effekt på utslipp usikker", source: "Aftenposten", url: "#"}
-      ]
-    };
-
     document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("topic").textContent = demo.topic;
-    document.getElementById("sentiment").style.width = Math.round(demo.sentiment * 100) + "%";
-    document.getElementById("question").textContent = demo.question;
-    document.getElementById("demo-json").textContent = JSON.stringify(demo, null, 2);
-
     document.getElementById("signup-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value;
