@@ -1,6 +1,1 @@
-import { kv } from '@vercel/kv';
-const hasKV = !!process.env.KV_REST_API_URL && !!process.env.KV_REST_API_TOKEN;
-const mem = new Map();
-export async function setJSON(key, val){ if(hasKV) return kv.set(key, JSON.stringify(val)); mem.set(key, JSON.stringify(val)); }
-export async function getJSON(key){ if(hasKV){ const v = await kv.get(key); if(!v) return null; if(typeof v === 'string'){ try{ return JSON.parse(v);}catch{ return v;} } return v; } const v = mem.get(key); return v ? JSON.parse(v) : null; }
-export async function incr(key){ if(hasKV) return kv.incr(key); const cur = Number(mem.get(key) || 0) + 1; mem.set(key, String(cur)); return cur; }
+import { kv } from '@vercel/kv';const hasKV=!!process.env.KV_REST_API_URL&&!!process.env.KV_REST_API_TOKEN;const mem=new Map();export async function setJSON(k,v){if(hasKV)return kv.set(k,JSON.stringify(v));mem.set(k,JSON.stringify(v));}export async function getJSON(k){if(hasKV){const v=await kv.get(k);if(!v)return null;if(typeof v==='string'){try{return JSON.parse(v);}catch{return v;}}return v;}const v=mem.get(k);return v?JSON.parse(v):null;}export async function setValue(k,v){if(hasKV)return kv.set(k,v);mem.set(k,v);}export async function incr(k){if(hasKV)return kv.incr(k);const cur=Number(mem.get(k)||0)+1;mem.set(k,String(cur));return cur;}

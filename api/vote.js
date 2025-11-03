@@ -1,8 +1,1 @@
-import { incr } from './_store.js';
-export default async function handler(req, res){
-  if(req.method !== 'POST') return res.status(405).end();
-  const { question_id, choice } = req.body || {};
-  if(!question_id || !['Ja','Nei','Usikker'].includes(choice)) return res.status(400).json({ error:'Bad input' });
-  await incr(`vote:${question_id}:${choice}`);
-  res.status(201).json({ ok:true });
-}
+import { incr } from './_store.js';export default async function handler(req,res){if(req.method!=='POST')return res.status(405).end();const {question_id,choice}=req.body||{};if(!question_id||!['Ja','Nei','Usikker'].includes(choice))return res.status(400).json({error:'Bad input'});await incr(`vote:${question_id}:${choice}`);res.status(201).json({ok:true});}
