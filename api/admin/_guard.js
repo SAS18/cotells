@@ -1,7 +1,7 @@
 
-export function requireAdmin(req, res){
-  const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
-  const admin = process.env.ADMIN_TOKEN || 'cotells_admin_2025';
-  if(!token || token !== admin){ res.status(401).json({ error:'Unauthorized' }); return false; }
+export function requireAdmin(req,res){
+  const token=(req.headers['authorization']||'').replace(/^Bearer\s+/i,'').trim();
+  const admin=process.env.ADMIN_TOKEN || 'cotells_admin_2025';
+  if(!token || token!==admin){ res.status(401).json({error:'Unauthorized'}); return false; }
   return true;
 }

@@ -9,13 +9,8 @@
 <body>
   <header class="nav">
     <div class="container">
-      <a class="brand" href="/">
-        <img src="/logo.svg" alt="Cotells logo" width="28" height="28" />
-        <span class="brand-name">Cotells</span>
-      </a>
-      <nav>
-        <a href="/admin/" class="cta-link">Admin</a>
-      </nav>
+      <a class="brand" href="/"><img src="/logo.svg" alt="Cotells" width="28" height="28"/><span class="brand-name">Cotells</span></a>
+      <nav><a href="/admin/" class="cta-link">Admin</a></nav>
     </div>
   </header>
 
@@ -23,16 +18,11 @@
     <div class="container hero-inner">
       <div class="hero-copy">
         <h1>Digitalt Samtidsbarometer</h1>
-        <p>Cotells kuraterer nyheter og viser sanntidsstemning.</p>
-        <form class="signup" id="signup-form">
-          <input type="email" id="email" placeholder="E-post for tidlig tilgang" required />
-          <button type="submit">Få tilgang</button>
-        </form>
+        <p>Stem deg gjennom dagens utvalgte tema. Neste sak vises automatisk etter du stemmer.</p>
       </div>
-
       <div class="hero-art">
         <div class="card">
-          <h3>Dagens tema</h3>
+          <h3 id="card-title">Dagens tema</h3>
           <p id="topic">Laster…</p>
           <div class="meter"><div class="meter-fill" id="sentiment" style="width:50%"></div></div>
           <div class="labels"><span>Negativ</span><span>Nøytral</span><span>Positiv</span></div>
@@ -47,54 +37,109 @@
   </section>
 
   <section class="container" style="margin-top:18px;">
-    <h3 style="color:#e2e8f0;margin:0 0 10px;">Flere tema i dag</h3>
-    <div id="topic-grid" class="grid"></div>
+    <h3 style="color:#e2e8f0;margin:0 0 10px;">Mest stemte saker</h3>
+    <div id="top-grid" class="grid"></div>
   </section>
 
-  <footer class="footer">
-    <div class="container">
-      <span>© <span id="year"></span> Cotells</span>
-      <a href="/admin/">Admin</a>
-    </div>
-  </footer>
+  <footer class="footer"><div class="container"><span>© <span id="year"></span> Cotells</span></div></footer>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("signup-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      alert("Takk! Vi lagrer " + email + " for tidlig tilgang.");
+  
+function getCookie(name){ return document.cookie.split('; ').find(r=>r.startsWith(name+'='))?.split('=')[1]; }
+function setCookie(name, value, days){
+  const d = new Date(); d.setTime(d.getTime() + (days*24*60*60*1000));
+  document.cookie = `${name}=${value}; expires=${d.toUTCString()}; path=/; SameSite=Lax`;
+}
+function ensureClientId(){
+  let cid = getCookie('cid');
+  if(!cid){
+    cid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+    setCookie('cid', cid, 180);
+  }
+  return cid;
+}
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+  let state = { list: [], active: [], index: 0 };
+
+  function widthFromSentiment(s){ return Math.max(0, Math.min(100, Math.round((Number(s||0)+1)*50))); }
+
+  async function fetchTopics(){
+    const r = await fetch('/api/topics'); const j = await r.json();
+    state.list = j.topics || [];
+    state.active = j.active || [];
+    // set index to first active id if exists
+    if(state.active && state.active.length) {
+      const firstId = state.active[0];
+      const idx = state.list.findIndex(t=>t.id===firstId);
+      state.index = idx >= 0 ? idx : 0;
+    } else { state.index = 0; }
+  }
+
+  function renderCard(){
+    const t = state.list[state.index]; if(!t) return;
+    document.getElementById('topic').textContent = t.title || '—';
+    document.getElementById('question').textContent = t.question || 'Hva mener du?';
+    document.getElementById('sentiment').style.width = widthFromSentiment(t.sentiment) + '%';
+    const options = document.getElementById('options'); const msg = document.getElementById('vote-msg');
+    options.innerHTML=''; msg.style.display='none';
+    ['Ja','Nei','Usikker'].forEach(c=>{
+      const b=document.createElement('button'); b.className='option'; b.textContent=c;
+      b.onclick=async()=>{
+        const cid = ensureClientId();
+        const r = await fetch('/api/vote', { method:'POST',
+          headers:{'Content-Type':'application/json','X-Client-Id':cid},
+          body: JSON.stringify({ question_id:t.id, choice:c }) });
+        const ok = r.status===201;
+        const j = await r.json().catch(()=>({}));
+        msg.style.display='block';
+        if(ok){
+          msg.textContent='Takk! Viser neste sak…';
+          // advance to next in active list if satt, ellers neste i listen
+          nextTopic();
+        } else {
+          msg.textContent = j.error || 'Kunne ikke lagre stemme.';
+        }
+      };
+      options.appendChild(b);
     });
-    function widthFromSentiment(s){ return Math.max(0, Math.min(100, Math.round((Number(s||0)+1)*50))); }
-    async function loadTopics(){
-      const r = await fetch('/api/topics'); const j = await r.json(); const list = j.topics || []; if(!list.length) return;
-      const t = list[0];
-      document.getElementById('topic').textContent = t.title || '—';
-      document.getElementById('question').textContent = t.question || 'Hva mener du?';
-      document.getElementById('sentiment').style.width = widthFromSentiment(t.sentiment) + '%';
-      const options = document.getElementById('options'); const msg = document.getElementById('vote-msg'); options.innerHTML = '';
-      ['Ja','Nei','Usikker'].forEach(c => {
-        const b = document.createElement('button'); b.className='option'; b.textContent=c;
-        b.onclick = async () => {
-          const r2 = await fetch('/api/vote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question_id:t.id,choice:c})});
-          msg.style.display='block'; msg.textContent = r2.ok ? 'Takk for stemmen!' : 'Kunne ikke lagre stemme.';
-        };
-        options.appendChild(b);
-      });
-      const grid = document.getElementById('topic-grid'); grid.innerHTML='';
-      list.slice(1,7).forEach(x => {
-        const el = document.createElement('div'); el.className='card';
-        el.innerHTML = `
-          <h4 style="margin:0 0 6px;">${x.title || '—'}</h4>
-          <div class="meter"><div class="meter-fill" style="width:${widthFromSentiment(x.sentiment)}%"></div></div>
-          <div class="labels"><span>Negativ</span><span>Nøytral</span><span>Positiv</span></div>
-          <p class="small" style="margin-top:6px;color:#94a3b8">Ja: ${x.votes?.Ja||0} · Nei: ${x.votes?.Nei||0} · Usikker: ${x.votes?.Usikker||0}</p>
-          ${x.url ? `<a href="${x.url}" target="_blank" rel="noopener" style="color:#7dd3fc">Kilde: ${x.source||'lenke'}</a>` : ''}
-        `;
-        grid.appendChild(el);
-      });
+  }
+
+  function nextTopic(){
+    // prefer active order
+    if(state.active && state.active.length){
+      const curId = state.list[state.index]?.id;
+      const pos = state.active.indexOf(curId);
+      const nextId = pos>=0 && pos < state.active.length-1 ? state.active[pos+1] : null;
+      if(nextId){
+        const idx = state.list.findIndex(t=>t.id===nextId);
+        if(idx>=0){ state.index = idx; renderCard(); return; }
+      }
     }
-    loadTopics();
+    // fallback: next in list
+    state.index = Math.min(state.index + 1, Math.max(0, state.list.length-1));
+    renderCard();
+  }
+
+  function renderTopVoted(){
+    const grid = document.getElementById('top-grid'); grid.innerHTML='';
+    const sorted = [...state.list].sort((a,b)=>(b.votes?.total||0)-(a.votes?.total||0)).slice(0,6);
+    sorted.forEach(x=>{
+      const el=document.createElement('div'); el.className='card';
+      el.innerHTML = `
+        <h4 style="margin:0 0 6px;">${x.title||'—'}</h4>
+        <div class="meter"><div class="meter-fill" style="width:${widthFromSentiment(x.sentiment)}%"></div></div>
+        <div class="labels"><span>Negativ</span><span>Nøytral</span><span>Positiv</span></div>
+        <p class="small" style="margin-top:6px;color:#94a3b8">Ja: ${x.votes?.Ja||0} · Nei: ${x.votes?.Nei||0} · Usikker: ${x.votes?.Usikker||0}</p>
+        ${x.url ? `<a href="${x.url}" target="_blank" rel="noopener" style="color:#7dd3fc">Kilde: ${x.source||'lenke'}</a>` : ''}
+      `;
+      grid.appendChild(el);
+    });
+  }
+
+  (async()=>{ await fetchTopics(); renderCard(); renderTopVoted(); })();
   </script>
 </body>
 </html>
